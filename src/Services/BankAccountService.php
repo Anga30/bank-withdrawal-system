@@ -14,23 +14,27 @@ use Psr\Log\LoggerInterface;
 
 class BankAccountService
 {
-    private string $snsTopicArn;
     public function __construct(private EntityManagerInterface $em, private SerializerInterface $serializer,
-    private SnsClient $snsClient, private LoggerInterface $logger)
+    private SnsClient $snsClient, private LoggerInterface $logger, private string $snsTopicArn)
     {}
-    public function withdraw($accountId, $amount)
+    public function withdraw(int $accountId, int $amount)
     {
         $this->em->beginTransaction();
         try{
-            $account = $this->em->getRepository(Account::class)->find($accountId);
-            $balance = $account->getBalance();
+            $account = $this->em->getRepository(Account::class)->findOneBy(['accountId' => $accountId]);
+            
             if($account){
+                $balance = $account->getBalance();
                 if($balance != null && $balance >= $amount){
                     //update
                     try{
                         $account->setBalance($balance - $amount);
-                        $this->em->persist($account);
                         $this->em->flush();
+
+                        //publish SNS event
+                        $event = new WithdrawalEvent($amount,  $accountId, 'SUCCESSFUL');
+                        $this->publishWithdrawalEven($event);
+                        $this->em->commit();
 
                         return "Withdrawal Succuessful";
                     }catch(Exception $e){
@@ -40,11 +44,6 @@ class BankAccountService
                     throw new InsufficientFundsException();
                 }
             }
-            //publish SNS event
-            $event = new WithdrawalEvent($amount,  $accountId, 'SUCCESSFUL');
-            $this->publishWithdrawalEven($event);
-            $this->em->commit();
-
         }catch(Exception $e){
             $this->em->rollback();
             throw new WithdrawalFailedException('Withdrawal failed due to an error: '.$e);

@@ -6,7 +6,26 @@
 <!-- Include Bootstrap CSS (add this line if not already included in your base layout) -->
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
-<div class="container-fluid" style="background-color: #f5f5dc;"> <!-- Cream background -->
+<div class="container-fluid" style="background-color: #f5f5dc;">
+    <!-- Navigation bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Sanlam FinTech</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('app_default') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('app_bank_acount') }}">Withdraw</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Welcome content -->
     <div class="welcome-wrapper text-center py-5">
         <h1 class="display-4" style="color: #00796b;">Welcome to Sanlam FinTech (SFT) ✅</h1>
         <h2 class="mb-4" style="color: #004d40;">Bank Withdrawal System</h2>
